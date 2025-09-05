@@ -44,6 +44,11 @@ class AbrigoAnimais {
         return false;
       }
     }
+    const setPessoaBrinquedos = new Set(pessoaBriquedos);
+    if (setPessoaBrinquedos.size !== pessoaBriquedos.length) {
+      return false;
+    }
+
     return true;
   }
 

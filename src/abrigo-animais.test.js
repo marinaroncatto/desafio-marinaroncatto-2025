@@ -2,6 +2,12 @@ import { AbrigoAnimais } from "./abrigo-animais";
 
 describe('Abrigo de Animais', () => {
 
+  test('Deve rejeitar input inválido', () => {
+    const resultado = new AbrigoAnimais().encontraPessoas('12354', 'RATO,BOLA', 'Loco');
+    expect(resultado.erro).toBe('Brinquedo inválido');
+    expect(resultado.lista).toBeFalsy();
+  });
+
   test('Deve rejeitar animal inválido', () => {
     const resultado = new AbrigoAnimais().encontraPessoas('CAIXA,RATO', 'RATO,BOLA', 'Lulu');
     expect(resultado.erro).toBe('Animal inválido');

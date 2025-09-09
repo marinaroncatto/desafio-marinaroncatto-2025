@@ -1,5 +1,7 @@
 class AbrigoAnimais {
 
+  static MAX_PET_PESSOA = 3;
+
   static animaisDoAbrigo = {
     REX: { tipo: 'CAO', brinquedos: ['RATO', 'BOLA'] },
     MIMI: { tipo: 'GATO', brinquedos: ['BOLA', 'LASER'] },
@@ -11,21 +13,16 @@ class AbrigoAnimais {
   }
 
   encontraPessoas(brinquedosPessoa1, brinquedosPessoa2, ordemAnimais) {
-    const pessoa1Briquedos = brinquedosPessoa1.split(',').map(x => x.trim().toUpperCase());
-    const pessoa2Briquedos = brinquedosPessoa2.split(',').map(x => x.trim().toUpperCase());
-    const ordemBichinhos = ordemAnimais.split(',').map(x => x.trim().toUpperCase());
+    const pessoa1Brinquedos = this.tratarEntrada(brinquedosPessoa1);
+    const pessoa2Brinquedos = this.tratarEntrada(brinquedosPessoa2);
+    const ordemBichinhos = this.tratarEntrada(ordemAnimais);
 
-    const p1Verific = this.validarBrinquedos(pessoa1Briquedos);
-    const p2Verific = this.validarBrinquedos(pessoa2Briquedos);
-    const ordemVerific = this.validarAnimais(ordemBichinhos);
-
-    if (!p1Verific || !p2Verific) 
+    if (!this.validarBrinquedos(pessoa1Brinquedos) || !this.validarBrinquedos(pessoa2Brinquedos)) 
       return { erro: 'Brinquedo inválido' };
     
-    if (!ordemVerific) 
+    if (!this.validarAnimais(ordemBichinhos)) 
       return { erro: 'Animal inválido' };
-    
-
+        
     let adotadosP1 = [];
     let adotadosP2 = [];
     let brinquedosReservados = [];
@@ -36,13 +33,13 @@ class AbrigoAnimais {
       let animal = AbrigoAnimais.animaisDoAbrigo[nome];
 
       if (animal.tipo === 'JABUTI') {
-        // deixa para o final
+        // testa o Jabuti no final
         filaJabutis.push(nome);
         continue;
       }
 
-      let aprovadoP1 = this.testaSequencia(animal, pessoa1Briquedos);
-      let aprovadoP2 = this.testaSequencia(animal, pessoa2Briquedos);
+      let aprovadoP1 = this.testaSequencia(animal, pessoa1Brinquedos);
+      let aprovadoP2 = this.testaSequencia(animal, pessoa2Brinquedos);
 
       let dono = 'abrigo';
 
@@ -51,14 +48,14 @@ class AbrigoAnimais {
         dono = 'abrigo';
 
       // 2. pessoa 1
-      else if (aprovadoP1 && adotadosP1.length < 3) {
+      else if (aprovadoP1 && adotadosP1.length < AbrigoAnimais.MAX_PET_PESSOA) {
         if (this.validarGato(animal, brinquedosReservados)) {
           dono = 'pessoa 1';
           adotadosP1.push(nome);
         }
       }
       // 3. pessoa 2
-      else if (aprovadoP2 && adotadosP2.length < 3) {
+      else if (aprovadoP2 && adotadosP2.length < AbrigoAnimais.MAX_PET_PESSOA) {
         if (this.validarGato(animal, brinquedosReservados)) {
           dono = 'pessoa 2';
           adotadosP2.push(nome);
@@ -68,14 +65,14 @@ class AbrigoAnimais {
       resultadoParcial[nome] = dono;
     } 
 
-    // agora processa os jabutis
+    // validar jabutis
     for (let nome of filaJabutis) {
       let animal = AbrigoAnimais.animaisDoAbrigo[nome];
 
-      let aprovadoP1 = this.testaSequencia(animal, pessoa1Briquedos);
-      let aprovadoP2 = this.testaSequencia(animal, pessoa2Briquedos);
+      let aprovadoP1 = this.testaSequencia(animal, pessoa1Brinquedos);
+      let aprovadoP2 = this.testaSequencia(animal, pessoa2Brinquedos);
 
-      let dono = this.validarJabuti(animal, aprovadoP1, aprovadoP2, adotadosP1, adotadosP2);
+      let dono = this.validarJabuti(aprovadoP1, aprovadoP2, adotadosP1, adotadosP2);
 
       if (dono === 'pessoa 1')
         adotadosP1.push(nome);
@@ -87,7 +84,7 @@ class AbrigoAnimais {
 
     // lista final
     let listaFinal = Object.entries(resultadoParcial)
-      .map(([animal, dono]) => `${animal[0] + animal.slice(1).toLowerCase()} - ${dono}`)
+      .map(([animal, dono]) => `${this.formatarNome(animal)} - ${dono}`)
       .sort();
 
     return { lista: listaFinal };
@@ -95,39 +92,42 @@ class AbrigoAnimais {
 
   // ===== Funções auxiliares =====
 
-  validarBrinquedos(pessoaBriquedos) {
+   tratarEntrada(inputUsuario) {
+    return inputUsuario.split(',').map(x => x.trim().toUpperCase());
+  }
+
+  validarBrinquedos(pessoaBrinquedos) {
     const brinquedosValidos = new Set();
     for (const animal of Object.values(AbrigoAnimais.animaisDoAbrigo)) {
       animal.brinquedos.forEach(b => brinquedosValidos.add(b));
     }
 
-    for (let brinquedo of pessoaBriquedos) {
+    for (let brinquedo of pessoaBrinquedos) {
       if (!brinquedosValidos.has(brinquedo))
         return false;
     }
-    const setPessoaBrinquedos = new Set(pessoaBriquedos);
-    if (setPessoaBrinquedos.size !== pessoaBriquedos.length)
+    const setPessoaBrinquedos = new Set(pessoaBrinquedos);
+    if (setPessoaBrinquedos.size !== pessoaBrinquedos.length)
       return false;
 
     return true;
   }
 
   validarAnimais(ordemBichinhos) {
+    const animaisValidos = new Set(Object.keys(AbrigoAnimais.animaisDoAbrigo));
+    //verifica se todos os animais são válidos
     for (let animal of ordemBichinhos) {
-      if (!Object.keys(AbrigoAnimais.animaisDoAbrigo).includes(animal))
+      if (!animaisValidos.has(animal)) 
         return false;
     }
-    const set = new Set(ordemBichinhos);
-    if (set.size !== ordemBichinhos.length)
-      return false;
-
-    return true;
+    //verifica se não há repetição
+    return new Set(ordemBichinhos).size === ordemBichinhos.length;
   }
 
   validarGato(animal, brinquedosReservados) {
     if (animal.tipo === 'GATO') {
       if (brinquedosReservados.some(b => animal.brinquedos.includes(b)))
-        return false;
+        return false; // gato não divide brinquedos
       else {
         brinquedosReservados.push(...animal.brinquedos);
         return true;
@@ -136,10 +136,10 @@ class AbrigoAnimais {
     return true;
   }
 
-  validarJabuti(animal, aprovadoP1, aprovadoP2, adotadosP1, adotadosP2) {
+  validarJabuti(aprovadoP1, aprovadoP2, adotadosP1, adotadosP2) {
 
-    const p1Ok = aprovadoP1 && adotadosP1.length > 0 && adotadosP1.length < 3;
-    const p2Ok = aprovadoP2 && adotadosP2.length > 0 && adotadosP2.length < 3;
+    const p1Ok = aprovadoP1 && adotadosP1.length > 0 && adotadosP1.length < AbrigoAnimais.MAX_PET_PESSOA;
+    const p2Ok = aprovadoP2 && adotadosP2.length > 0 && adotadosP2.length < AbrigoAnimais.MAX_PET_PESSOA;
 
     if (p1Ok && p2Ok) // regra de empate
       return 'abrigo';   
@@ -152,15 +152,21 @@ class AbrigoAnimais {
   }
 
   testaSequencia(animal, brinquedosPessoa) {
+    
     if (animal.tipo === 'JABUTI') {
       // ordem não importa para o jabuti
-      return animal.brinquedos.every(b => brinquedosPessoa.includes(b));
+      const setBrinquedos = new Set(brinquedosPessoa);
+      return animal.brinquedos.every(b => setBrinquedos.has(b));
     }
     // ordem importa
     const filtrados = brinquedosPessoa.filter(b => animal.brinquedos.includes(b));
     return filtrados.join(',') === animal.brinquedos.join(',');
 
   }
+
+  formatarNome(nome) {
+  return nome.charAt(0) + nome.slice(1).toLowerCase();
+}
 
 } //fim da classe
 

@@ -19,12 +19,12 @@ class AbrigoAnimais {
     const p2Verific = this.validarBrinquedos(pessoa2Briquedos);
     const ordemVerific = this.validarAnimais(ordemBichinhos);
 
-    if (!p1Verific || !p2Verific) {
+    if (!p1Verific || !p2Verific) 
       return { erro: 'Brinquedo inválido' };
-    }
-    if (!ordemVerific) {
+    
+    if (!ordemVerific) 
       return { erro: 'Animal inválido' };
-    }
+    
 
     let adotadosP1 = [];
     let adotadosP2 = [];
@@ -47,9 +47,9 @@ class AbrigoAnimais {
       let dono = 'abrigo';
 
       // 1. empate
-      if (aprovadoP1 && aprovadoP2) {
+      if (aprovadoP1 && aprovadoP2)
         dono = 'abrigo';
-      }
+
       // 2. pessoa 1
       else if (aprovadoP1 && adotadosP1.length < 3) {
         if (this.validarGato(animal, brinquedosReservados)) {
@@ -66,7 +66,7 @@ class AbrigoAnimais {
       }
 
       resultadoParcial[nome] = dono;
-    }
+    } 
 
     // agora processa os jabutis
     for (let nome of filaJabutis) {
@@ -77,8 +77,10 @@ class AbrigoAnimais {
 
       let dono = this.validarJabuti(animal, aprovadoP1, aprovadoP2, adotadosP1, adotadosP2);
 
-      if (dono === 'pessoa 1') adotadosP1.push(nome);
-      else if (dono === 'pessoa 2') adotadosP2.push(nome);
+      if (dono === 'pessoa 1')
+        adotadosP1.push(nome);
+      else if (dono === 'pessoa 2')
+        adotadosP2.push(nome);
 
       resultadoParcial[nome] = dono;
     }
@@ -91,7 +93,7 @@ class AbrigoAnimais {
     return { lista: listaFinal };
   }
 
-  // ===== auxiliares =====
+  // ===== Funções auxiliares =====
 
   validarBrinquedos(pessoaBriquedos) {
     const brinquedosValidos = new Set();
@@ -100,35 +102,33 @@ class AbrigoAnimais {
     }
 
     for (let brinquedo of pessoaBriquedos) {
-      if (!brinquedosValidos.has(brinquedo)) {
+      if (!brinquedosValidos.has(brinquedo))
         return false;
-      }
     }
     const setPessoaBrinquedos = new Set(pessoaBriquedos);
-    if (setPessoaBrinquedos.size !== pessoaBriquedos.length) {
+    if (setPessoaBrinquedos.size !== pessoaBriquedos.length)
       return false;
-    }
+
     return true;
   }
 
   validarAnimais(ordemBichinhos) {
     for (let animal of ordemBichinhos) {
-      if (!Object.keys(AbrigoAnimais.animaisDoAbrigo).includes(animal)) {
+      if (!Object.keys(AbrigoAnimais.animaisDoAbrigo).includes(animal))
         return false;
-      }
     }
     const set = new Set(ordemBichinhos);
-    if (set.size !== ordemBichinhos.length) {
+    if (set.size !== ordemBichinhos.length)
       return false;
-    }
+
     return true;
   }
 
   validarGato(animal, brinquedosReservados) {
     if (animal.tipo === 'GATO') {
-      if (brinquedosReservados.some(b => animal.brinquedos.includes(b))) {
+      if (brinquedosReservados.some(b => animal.brinquedos.includes(b)))
         return false;
-      } else {
+      else {
         brinquedosReservados.push(...animal.brinquedos);
         return true;
       }
@@ -137,25 +137,34 @@ class AbrigoAnimais {
   }
 
   validarJabuti(animal, aprovadoP1, aprovadoP2, adotadosP1, adotadosP2) {
-    let dono = 'abrigo';
+    if (animal.tipo !== 'JABUTI')
+      return 'abrigo'; // segurança
 
-    if (animal.tipo === 'JABUTI') {
-      if (aprovadoP1 && adotadosP1.length > 0 && adotadosP1.length < 3) {
-        dono = 'pessoa 1';
-      } else if (aprovadoP2 && adotadosP2.length > 0 && adotadosP2.length < 3) {
-        dono = 'pessoa 2';
-      }
-    }
-    return dono;
+    const p1Ok = aprovadoP1 && adotadosP1.length > 0 && adotadosP1.length < 3;
+    const p2Ok = aprovadoP2 && adotadosP2.length > 0 && adotadosP2.length < 3;
+
+    if (p1Ok && p2Ok) // regra de empate
+      return 'abrigo';   
+    if (p1Ok)
+      return 'pessoa 1';
+    if (p2Ok)
+      return 'pessoa 2';
+
+    return 'abrigo'; // caso nenhum anterior atenda aos critérios
   }
 
   testaSequencia(animal, brinquedosPessoa) {
-    let filtrados = brinquedosPessoa.filter(b => animal.brinquedos.includes(b));
+    if (animal.tipo === 'JABUTI') {
+      // ordem não importa para o jabuti
+      return animal.brinquedos.every(b => brinquedosPessoa.includes(b));
+    }
+    // ordem importa
+    const filtrados = brinquedosPessoa.filter(b => animal.brinquedos.includes(b));
     return filtrados.join(',') === animal.brinquedos.join(',');
-  }
 
+  }
 
 } //fim da classe
 
-    
+
 export { AbrigoAnimais as AbrigoAnimais };

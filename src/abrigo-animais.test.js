@@ -68,7 +68,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   });
 
-   test('Gato e cachorro não aceitam brinquedos fora da ordem', () => {
+   test('Deve rejeitar brinquedos fora da ordem para gato e cachorro', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'SKATE,BOLA,RATO', 'LASER,BOLA', 'Mimi,Rex');
       expect(resultado.lista[0]).toBe('Mimi - abrigo');
@@ -77,7 +77,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   });
 
-   test('Gatos não dividem brinquedos', () => {
+   test('Deve impedir que gatos dividam brinquedos', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'SKATE,BOLA,RATO', 'RATO,BOLA,LASER', 'Mimi,Zero');
       expect(resultado.lista[0]).toBe('Mimi - pessoa 2');
@@ -86,7 +86,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   });
 
-  test('Deve encontrar pessoa para um animal Jabuti que tenha outro animal (com pessoa 1)', () => {
+  test('Deve habilitar pessoa para adotar Jabuti se ela tiver outro animal (para pessoa 1)', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'SKATE,RATO,BOLA', 'RATO,NOVELO', 'Rex,Fofo,Loco');
       expect(resultado.lista[0]).toBe('Fofo - abrigo');
@@ -96,7 +96,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   });
 
-  test('Deve encontrar pessoa para um animal Jabuti que tenha outro animal (com pessoa 2)', () => {
+  test('Deve habilitar pessoa para adotar Jabuti se ela tiver outro animal (para pessoa 2)', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'RATO,NOVELO', 'SKATE,RATO,BOLA', 'Rex,Fofo,Loco');
       expect(resultado.lista[0]).toBe('Fofo - abrigo');
@@ -106,7 +106,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   });
 
-  test('Jabuti não vai para alguém sem outro animal', () => {
+  test('Deve impedir que jabuti seja adotado por pessoa sem outro animal', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'SKATE,RATO,BOLA', 'RATO,NOVELO', 'Fofo,Loco');
       expect(resultado.lista[0]).toBe('Fofo - abrigo');
@@ -115,7 +115,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   });
 
-  test('Jabuti não sei importa com a ordem dos brinquedos', () => {
+  test('Deve aceitar brinquedos fora da ordem para jabuti', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'RATO,BOLA,SKATE', 'RATO,NOVELO', 'Fofo,Loco');
       expect(resultado.lista[0]).toBe('Fofo - abrigo');
@@ -124,7 +124,7 @@ describe('Abrigo de Animais', () => {
       expect(resultado.erro).toBeFalsy();
   }); 
 
-  test('Se duas pessoas são aptas, o Jabuti fica no abrigo', () => {
+  test('Deve deixar jabuti no abrigo caso existam duas pessoas aptas', () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       'SKATE,RATO,BOLA', 'CAIXA,RATO,NOVELO,SKATE', 'Rex,Bola,Loco');
       expect(resultado.lista[0]).toBe('Bola - pessoa 2');

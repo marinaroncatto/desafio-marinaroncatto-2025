@@ -33,28 +33,30 @@ class AbrigoAnimais {
       let animal = AbrigoAnimais.animaisDoAbrigo[nome];
 
       if (animal.tipo === 'JABUTI') {
-        // testa o Jabuti no final
+        // Testa o jabuti no final
         filaJabutis.push(nome);
         continue;
       }
+
+      // Validar cães e gatos
 
       let aprovadoP1 = this.testaSequencia(animal, pessoa1Brinquedos);
       let aprovadoP2 = this.testaSequencia(animal, pessoa2Brinquedos);
 
       let dono = 'abrigo';
 
-      // 1. empate
+      // Caso empate
       if (aprovadoP1 && aprovadoP2)
         dono = 'abrigo';
 
-      // 2. pessoa 1
+      // Caso pessoa 1
       else if (aprovadoP1 && adotadosP1.length < AbrigoAnimais.MAX_PET_PESSOA) {
         if (this.validarGato(animal, brinquedosReservados)) {
           dono = 'pessoa 1';
           adotadosP1.push(nome);
         }
       }
-      // 3. pessoa 2
+      // Caso pessoa 2
       else if (aprovadoP2 && adotadosP2.length < AbrigoAnimais.MAX_PET_PESSOA) {
         if (this.validarGato(animal, brinquedosReservados)) {
           dono = 'pessoa 2';
@@ -65,7 +67,7 @@ class AbrigoAnimais {
       resultadoParcial[nome] = dono;
     } 
 
-    // validar jabutis
+    // Validar jabutis
     for (let nome of filaJabutis) {
       let animal = AbrigoAnimais.animaisDoAbrigo[nome];
 
@@ -82,7 +84,7 @@ class AbrigoAnimais {
       resultadoParcial[nome] = dono;
     }
 
-    // lista final
+    // Lista final
     let listaFinal = Object.entries(resultadoParcial)
       .map(([animal, dono]) => `${this.formatarNome(animal)} - ${dono}`)
       .sort();
@@ -124,6 +126,19 @@ class AbrigoAnimais {
     return new Set(ordemBichinhos).size === ordemBichinhos.length;
   }
 
+  testaSequencia(animal, brinquedosPessoa) {
+    
+    if (animal.tipo === 'JABUTI') {
+      // ordem não importa para o jabuti
+      const setBrinquedos = new Set(brinquedosPessoa);
+      return animal.brinquedos.every(b => setBrinquedos.has(b));
+    }
+    // ordem importa
+    const filtrados = brinquedosPessoa.filter(b => animal.brinquedos.includes(b));
+    return filtrados.join(',') === animal.brinquedos.join(',');
+
+  }
+
   validarGato(animal, brinquedosReservados) {
     if (animal.tipo === 'GATO') {
       if (brinquedosReservados.some(b => animal.brinquedos.includes(b)))
@@ -149,19 +164,6 @@ class AbrigoAnimais {
       return 'pessoa 2';
 
     return 'abrigo'; // caso nenhum anterior atenda aos critérios
-  }
-
-  testaSequencia(animal, brinquedosPessoa) {
-    
-    if (animal.tipo === 'JABUTI') {
-      // ordem não importa para o jabuti
-      const setBrinquedos = new Set(brinquedosPessoa);
-      return animal.brinquedos.every(b => setBrinquedos.has(b));
-    }
-    // ordem importa
-    const filtrados = brinquedosPessoa.filter(b => animal.brinquedos.includes(b));
-    return filtrados.join(',') === animal.brinquedos.join(',');
-
   }
 
   formatarNome(nome) {

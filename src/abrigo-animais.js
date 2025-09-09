@@ -137,8 +137,6 @@ class AbrigoAnimais {
   }
 
   validarJabuti(animal, aprovadoP1, aprovadoP2, adotadosP1, adotadosP2) {
-    if (animal.tipo !== 'JABUTI')
-      return 'abrigo'; // segurança
 
     const p1Ok = aprovadoP1 && adotadosP1.length > 0 && adotadosP1.length < 3;
     const p2Ok = aprovadoP2 && adotadosP2.length > 0 && adotadosP2.length < 3;
